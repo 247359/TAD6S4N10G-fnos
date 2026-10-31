@@ -14,13 +14,19 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" \
     -o /out/tad-module ./backend/powerguard
 
-# ---- 运行阶段：最小 Debian + 监控/备份所需工具 ----
+# ---- 运行阶段：最小 Debian + 监控/备份/固件所需工具 ----
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
       smartmontools \
       rsync \
       util-linux \
       ca-certificates \
+      pciutils \
+      flashrom \
+      dmidecode \
+      ethtool \
+      kmod \
+      file \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /out/tad-module /app/tad-module
